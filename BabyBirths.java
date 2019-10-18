@@ -82,6 +82,22 @@ public class BabyBirths {
         }
     }
     
+    public StorageResource getDatesManyFiles (String name, String gender) {
+        // Processes multiple years' files and returns the dates as StorageResource, as long as files end with YYYY.csv
+        DirectoryResource dr = new DirectoryResource();
+        StorageResource dates = new StorageResource();
+        String fileName = "";
+        int length = 0;
+        // Get dates of files and add them as strings to a storage resource container
+        for (File f : dr.selectedFiles()) {
+            fileName = f.getName();
+            length = fileName.length();
+            String currDate = fileName.substring((length-8), (length-4));
+            dates.add(currDate);
+        }
+        return dates;
+    }
+    
     public String getName(int year, int rank, String gender) {
         // SUMMARY: Returns name with given rank and gender, or "NO NAME"
         String yearStr = Integer.toString(year);
@@ -117,18 +133,8 @@ public class BabyBirths {
     }
     
     public int yearOfHighestRank(String name, String gender) {
-        // Processes multiple years' files and returns the year with highest rank for given name and gender
-        DirectoryResource dr = new DirectoryResource();
-        StorageResource dates = new StorageResource();
-        String fileName = "";
-        int length = 0;
-        // Get dates of files and add them as strings to a storage resource container
-        for (File f : dr.selectedFiles()) {
-            fileName = f.getName();
-            length = fileName.length();
-            String currDate = fileName.substring((length-8), (length-4));
-            dates.add(currDate);
-        }
+        // SUMMARY: Processes multiple years' files and returns the year with highest rank for given name and gender
+        StorageResource dates = getDatesManyFiles(name, gender);
         int bestRank = -1;
         int currentRank = -1;
         int bestYear = -1;
@@ -145,6 +151,35 @@ public class BabyBirths {
             }
         }
         return bestYear;
+    }
+    
+    public double getAverageRank (String name, String gender) {
+        // Processes multiple files and returns average rank for given name and gender
+        StorageResource dates = getDatesManyFiles(name, gender);
+        double averageRank = 0.0;
+        int currentRank = -1;
+        int rankSum = 0;
+        int fileCount = 0;
+        // Interate through each year, get rank, and add rank to sum (unless the name isn't contained in a file)
+        for (String year : dates.data()) {
+            int yearInt = Integer.parseInt(year);
+            currentRank = getRank(yearInt, name, gender);
+            if (currentRank == -1) {
+                averageRank = -1.0;
+                break;
+            } else {
+                rankSum += currentRank;
+                fileCount += 1;
+            }
+        }
+        if (averageRank == -1.0) {
+            return averageRank;
+        } else {
+            double rankSumDb = rankSum;
+            double fileCountDb = fileCount;
+            averageRank = (rankSumDb / fileCountDb);
+            return averageRank;
+        }
     }
     
     public void testBirths () {
