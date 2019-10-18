@@ -182,6 +182,33 @@ public class BabyBirths {
         }
     }
     
+    public int getTotalBirthsRankedHigher (int year, String name, String gender) {
+        // SUMMARY: Returns total number of births of all same-gendered babies who ranked higher than given name
+        // Access file for given year
+        String yearStr = Integer.toString(year);
+        FileResource fr = new FileResource("data/yob" + yearStr + ".csv");        
+        // Calculate number of babies born with given name
+        int numBorn = 0;
+        int higherRanked = 0;
+        for (CSVRecord rec : fr.getCSVParser(false)) {
+            if (rec.get(0).equals(name) && rec.get(1).equals(gender)) {
+                numBorn = Integer.parseInt(rec.get(2));
+            }
+        }
+        // Iterate through recs and update how many total babies born that rank higher (for same-gendered babies), if name existed
+        if (numBorn > 0) {
+            for (CSVRecord rec : fr.getCSVParser(false)) {
+                int currNumBorn = Integer.parseInt(rec.get(2));
+                if (rec.get(1).equals(gender) && (currNumBorn > numBorn)) {
+                    higherRanked += currNumBorn;
+                }
+            }
+            return higherRanked;
+        } else {
+            return -1;
+        }
+    }
+    
     public void testBirths () {
         FileResource fr = new FileResource("data/example-small.csv");
         totalBirths(fr);
@@ -208,24 +235,14 @@ public class BabyBirths {
         System.out.println("Best year for chosen name and gender was " + bestYear);
     }
     
-    public void testAll () {
-        // Test totalBirths
-        FileResource fr = new FileResource("data/example-small.csv");
-        totalBirths(fr);
-        // Test totalGender
-        int results = totalGender(fr, "M");
-        System.out.println("Number of boys: " + results);
-        // Test getRank
-        int rank = getRank(2010, "Emma", "F");
-        System.out.println(rank);
-        // Test getName
-        String name = getName(2010, 1, "F");
-        System.out.println(name);
-        // Test whatIsNameInYear
-        whatIsNameInYear("Sarah", 2014 ,1890, "F");
-        // Test yearOfHighestRank
-        int bestYear = yearOfHighestRank("Emma", "F");
-        System.out.println("Best year for chosen name and gender was " + bestYear);
+    public void testGetAverageRank () {
+        double averageRank = getAverageRank("Emma", "F");
+        System.out.println("Average rank for Emma, gender F, over chosen years was " + averageRank);
+    }
+    
+    public void testGetTotalBirthsRankedHigher () {
+        int higherRanked = getTotalBirthsRankedHigher(2014, "Olivia", "F");
+        System.out.println("There were " + higherRanked + " babies born of the same gender but higher ranked than Olivia in 2014");
     }
 }
 
