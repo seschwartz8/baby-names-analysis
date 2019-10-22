@@ -57,21 +57,24 @@ public class BabyBirths {
     
     public int getRank (int year, String name, String gender) {
         // SUMMARY: returns rank of name in file with given gender, or -1 if no such name exists
-        // Access file for given year
         String yearStr = Integer.toString(year);
+        // Access file for given year
         FileResource fr = new FileResource("data/yob" + yearStr + ".csv");
         // Calculate number babies born with given name
         int numBorn = 0;
         int rank = 1;
         for (CSVRecord rec : fr.getCSVParser(false)) {
+            // If the rec's name and gender match the givens assign number of babies to numBorn
             if (rec.get(0).equals(name) && rec.get(1).equals(gender)) {
                 numBorn = Integer.parseInt(rec.get(2));
             }
+            // Otherwise do nothing, leaving numBorn = 0
         }
         // Iterate through recs and update how many names rank higher (for same-gendered babies), if name existed
         if (numBorn > 0) {
             for (CSVRecord rec : fr.getCSVParser(false)) {
                 int currNumBorn = Integer.parseInt(rec.get(2));
+                // If rec's gender matches given and number of babies rank higher add 1 to rank
                 if (rec.get(1).equals(gender) && (currNumBorn > numBorn)) {
                     rank += 1;
                 }
@@ -88,7 +91,7 @@ public class BabyBirths {
         StorageResource dates = new StorageResource();
         String fileName = "";
         int length = 0;
-        // Get dates of files and add them as strings to a storage resource container
+        // Get year of each file and add it as string to a storage resource container
         for (File f : dr.selectedFiles()) {
             fileName = f.getName();
             length = fileName.length();
@@ -106,12 +109,15 @@ public class BabyBirths {
         String currName = "";
         int currRank = -1;
         for (CSVRecord rec : fr.getCSVParser(false)) {
+            // If rec's gender matches given, get its rank
             if (rec.get(1).equals(gender)) {
                 currName = rec.get(0);
                 currRank = getRank(year, currName, gender);
+                // Break loop if rank equals the given search
                 if (currRank == rank) {
                     break;
                 } else {
+                    // If rank didn't equal given, reset currRank to -1 and continue loop
                     currRank = -1;
                 }
             }
@@ -125,7 +131,7 @@ public class BabyBirths {
     
     public void whatIsNameInYear(String name, int year, int newYear, String gender) {
         // SUMMARY: determines what name you would be in a different year based on your name's rank
-        // Get current rank
+        // Get your rank based on given parameters
         int rank = getRank(year, name, gender);
         // Get name in new year with current rank
         String newName = getName(newYear, rank, gender);
@@ -227,7 +233,8 @@ public class BabyBirths {
     }
     
     public void testWhatIsNameInYear () {
-        whatIsNameInYear("Sarah", 2014 ,1890, "F");
+        whatIsNameInYear("Sarah", 1994, 2014, "F");
+        whatIsNameInYear("Matt", 1997 ,2014, "M");
     }
     
     public void testYearOfHighestRank () {
