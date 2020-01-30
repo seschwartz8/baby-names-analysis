@@ -1,6 +1,8 @@
 # Baby Names Analysis
 
 ## Created by Sarah "Sasa" Schwartz
+
+## Description
 A Java program written for Duke's Java Programming Sequence via Coursera that analyzes data about popular baby names
 
 ## Technologies
